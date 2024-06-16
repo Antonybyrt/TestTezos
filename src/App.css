@@ -1,38 +1,95 @@
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #e9ecef; /* Couleur de fond globale */
+}
+
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Assurez-vous que le conteneur prend toute la hauteur */
 }
 
 .App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+  background-color: #f8f9fa;
+  padding: 2vmin;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  margin: 2vmin;
+  flex: 1; /* Pour prendre le reste de l'espace disponible */
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
+  align-items: center;
+}
+
+.App-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 2vmin;
+  flex-wrap: wrap;
+  gap: 2vmin;
+}
+
+.App-logo {
+  height: 20vmin;
+  pointer-events: none;
+  transition: transform 0.2s ease-in-out;
+}
+
+.App-logo:hover {
+  transform: scale(1.1);
+}
+
+button {
+  background-color: #007bff;
   color: white;
+  border: none;
+  padding: 1vmin 2vmin;
+  font-size: 2vmin;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+h1 {
+  font-size: calc(10px + 2vmin);
+  color: #495057;
+  margin: 2vmin 0;
 }
 
 .App-link {
-  color: #61dafb;
+  color: #007bff;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  transition: color 0.3s, border-bottom 0.3s;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.App-link:hover {
+  color: #0056b3;
+  border-bottom: 2px solid #0056b3;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+a:hover {
+  color: #0056b3;
 }

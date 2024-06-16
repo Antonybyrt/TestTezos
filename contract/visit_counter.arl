@@ -1,0 +1,137 @@
+archetype visit_counter(owner : address)
+
+/* ERRORS ------------------------- */
+
+constant MUST_BE_REGISTERED_BEFORE : string = "MUST_BE_REGISTERED_BEFORE"
+constant MUST_PAY_1_TZ_TO_VISIT : string = "MUST_PAY_1TZ_TO_VISIT"
+constant MUST_WAIT_BEFORE_VISIT : string = "MUST_WAIT_BEFORE_VISIT"
+constant ONLY_OWNER_CAN_WITHDRAW : string = "ONLY_OWNER_CAN_WITHDRAW"
+constant KEY_NOT_FOUND : string = "KEY_NOT_FOUND"
+constant ONLY_THE_CALLER_CAN_TRIGGER_THIS_ENTRYPOINT : string = "ONLY_THE_CALLER_CAN_TRIGGER_THIS_ENTRYPOINT"
+constant ALREADY_REGISTERED : string = "ALREADY_REGISTERED"
+
+/*
+ * constant variables
+ */
+constant VISIT_COST : tez = 1tz
+constant WAIT_TIME : duration = 60s
+
+/*
+ * mapping user visits nd last visits
+ */
+variable user_visits : map<address, nat> = [] // Map to store visit counts for each user
+variable last_visit : map<address, date> = [] // Map to store the last visit timestamp for each user
+
+/*
+ * Used to increment values
+ */
+variable p : nat = 0
+variable d : date = 2019-01-01 // initialized ranomly, better way to initialize ?
+
+/*
+ * Check if a user is registered
+ */
+function is_registered() : bool {
+  match user_visits[caller] with
+  | some(s) -> return true
+  | none -> return false
+  end
+}
+
+/*
+ * Increments a value to a type option in a map
+ */
+function increment_nat() {
+  match user_visits[caller] with
+    | some(s) -> p := s + 1
+    | none -> p := 1
+  end;
+
+  user_visits.put(caller, p)
+}
+
+/*
+ * Check if it's the first visit
+ * returns bool value
+ */
+function is_first_visit() : bool {
+  match user_visits[caller] with
+  | some(s) -> 
+      if s = 0 then return true
+        else return false
+  | none -> fail((KEY_NOT_FOUND, caller))
+  end
+}
+
+/*
+ * Increments 60 seconds to date.now 
+ */
+function increment_date() {
+  match last_visit[caller] with
+   | some(s) -> d := s + WAIT_TIME
+   | none -> d := now
+  end;
+
+  last_visit.put(caller, d)
+}
+
+/*
+ * Increments 60 seconds to date.now and verify if the user waited 60sec before re-visit
+ * Returns a bool value
+ */
+function verify_wait_time() : bool {
+
+  increment_date();
+
+  if is_first_visit() = true then 
+    return true
+  else 
+    match last_visit[caller] with
+    | some(s) -> 
+      if now >= s then 
+        return true
+      else 
+        return false
+    | none -> return false
+    end
+  
+}
+
+/*
+ * Entry point to register the caller
+ */ 
+entry register() {
+  called by caller otherwise ONLY_THE_CALLER_CAN_TRIGGER_THIS_ENTRYPOINT
+  require {
+    c1: is_registered() = false otherwise ALREADY_REGISTERED; // Check if the user is already registered
+  }
+  effect {
+    user_visits.put(caller, 0); // Initialize visit count to 0
+  }
+}
+
+/*
+ * Entry point to visit
+ */
+entry visit() {
+  called by caller otherwise ONLY_THE_CALLER_CAN_TRIGGER_THIS_ENTRYPOINT
+  require {
+    r1: user_visits.contains(caller) otherwise MUST_BE_REGISTERED_BEFORE; // Ensure the user is registered 
+    r2: transferred = VISIT_COST otherwise MUST_PAY_1_TZ_TO_VISIT; // Ensure the user pays exactly 1 tez for each visit
+    r3: verify_wait_time() otherwise MUST_WAIT_BEFORE_VISIT; // Ensure at least 1 minute has passed since the last visit
+  }
+  effect {
+    increment_nat(); // Add one visit to the user_visits map
+    last_visit.put(caller, now); // Update the last visit time to now
+  }
+}
+
+/*
+ * Entry point to withdraw the contract balance
+ */
+entry withdraw() {
+  called by owner otherwise ONLY_OWNER_CAN_WITHDRAW
+  effect {
+    transfer balance to owner; // Transfer the contract balance to the owner
+  }
+}

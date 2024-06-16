@@ -1,25 +1,35 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { SettingsProvider } from './contexts/Settings';
+import { TaquitoProvider } from './contexts/Taquito';
+import { BeaconProvider } from './contexts/beacon';
+import { ContractProvider } from './contexts/Contract';
+import Register from './components/register.component';
+import Visit from './components/visit.component';
+import Withdraw from './components/withdraw.component';
+import tezosLogo from './logo.svg'; 
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <SettingsProvider>
+      <TaquitoProvider>
+        <BeaconProvider>
+          <ContractProvider>
+            <div className="App">
+              <header className="App-header">
+                <img src={tezosLogo} className="App-logo" alt="Tezos logo" />
+                <h1>Exemple d'intéraction avec un smart contract sur le testnet de Tezos.</h1>
+                <div className="App-content">
+                  <Register />
+                  <Visit />
+                  <Withdraw />
+                </div>
+              </header>
+            </div>
+          </ContractProvider>
+        </BeaconProvider>
+      </TaquitoProvider>
+    </SettingsProvider>
   );
 }
 
