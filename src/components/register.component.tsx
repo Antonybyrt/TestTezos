@@ -16,10 +16,15 @@ function Register() {
         if (!isConnected()) {
             await connect();
         }
-        const contract = await tezos.wallet.at(contractAddress);
-        const operation = await contract.methodsObject.register().send();
-        console.log('waiting for' + operation.opHash + 'to be confirmed');
-        await operation.receipt();
+        try {
+            const contract = await tezos.wallet.at(contractAddress);
+            const operation = await contract.methodsObject.register().send();
+            console.log('waiting for' + operation.opHash + 'to be confirmed');
+            await operation.receipt();
+        } catch (error:any) {
+            alert(`Erreur: ${error.message}`);
+        }
+        
     }
 
     return (
